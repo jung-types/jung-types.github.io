@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title id="pageTitle">My Wiki</title>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <style>
+            /* ---------- THEME VARIABLES ---------- */
+            :root {
+                --bg: #f6f6f6;
+                --sidebar-bg: #f8f9fa;
+                --content-bg: #ffffff;
+                --text: #202122;
+                --text-secondary: #54595d;
+                --border: #a2a9b1;
+                --link: #0645ad;
+                --link-visited: #0b0080;
+                --hover-bg: #eaf3ff;
+                --code-bg: #f7f7f7;
+                --blockquote-bg: #f9f9f9;
+                --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                --sidebar-shadow: -2px 0 8px rgba(0, 0, 0, 0.05);
+                --input-bg: #ffffff;
+                --toggle-bg: #e9ecef;
+                --toggle-color: #495057;
+            }
+
+            [data-theme="dark"] {
+                --bg: #1a1a1a;
+                --sidebar-bg: #232323;
+                --content-bg: #2b2b2b;
+                --text: #e0e0e0;
+                --text-secondary: #b0b0b0;
+                --border: #4a4a4a;
+                --link: #6ea8fe;
+                --link-visited: #b388ff;
+                --hover-bg: #3a3a3a;
+                --code-bg: #363636;
+                --blockquote-bg: #333333;
+                --shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+                --sidebar-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+                --input-bg: #333333;
+                --toggle-bg: #4a4a4a;
+                --toggle-color: #f1f1f1;
+            }
+
+            /* ---------- RESET & BASE ---------- */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                font-size: 16px;
+                line-height: 1.6;
+                color: var(--text);
+                background: var(--bg);
+                display: flex;
+                min-height: 100vh;
+                transition:
+                    background 0.3s ease,
+                    color 0.3s ease;
+            }
+
+            /* ---------- SIDEBAR ---------- */
+            .sidebar {
+                width: 280px;
+                background: var(--sidebar-bg);
+                border-right: 1px solid var(--border);
+                padding: 1.2em 1em;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                overflow-y: auto;
+                box-shadow: var(--sidebar-shadow);
+                transition:
+                    background 0.3s ease,
+                    border-color 0.3s ease;
+            }
+            .sidebar-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.2em;
+            }
+            .sidebar .logo {
+                font-size: 1.8em;
+                font-family: "Linux Libertine", "Georgia", serif;
+                font-weight: bold;
+                letter-spacing: -0.5px;
+            }
+            .sidebar .logo a {
+                text-decoration: none;
+                color: var(--text);
+                transition: color 0.2s;
+            }
+            .sidebar .logo a:hover {
+                color: var(--link);
+            }
+            .theme-toggle {
+                background: var(--toggle-bg);
+                border: none;
+                border-radius: 20px;
+                width: 40px;
+                height: 24px;
+                cursor: pointer;
+                position: relative;
+                transition: background 0.3s;
+                display: flex;
+                align-items: center;
+                padding: 0 2px;
+            }
+            .theme-toggle .toggle-thumb {
+                width: 20px;
+                height: 20px;
+                background: var(--toggle-color);
+                border-radius: 50%;
+                transition: transform 0.3s ease;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            }
+            [data-theme="dark"] .theme-toggle .toggle-thumb {
+                transform: translateX(16px);
+            }
+            .search-box {
+                margin-bottom: 1.5em;
+            }
+            .search-box input[type="search"] {
+                width: 100%;
+                padding: 0.5em 0.8em;
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                background: var(--input-bg);
+                color: var(--text);
+                font-family: inherit;
+                transition:
+                    border-color 0.3s,
+                    box-shadow 0.3s,
+                    background 0.3s;
+            }
+            .search-box input[type="search"]:focus {
+                outline: none;
+                border-color: var(--link);
+                box-shadow: 0 0 0 3px rgba(6, 69, 173, 0.15);
+            }
+            .sidebar nav ul {
+                list-style: none;
+                padding: 0;
+            }
+            .sidebar nav ul li {
+                margin-bottom: 0.2em;
+            }
+            .sidebar nav ul li a {
+                text-decoration: none;
+                color: var(--text);
+                font-size: 0.95em;
+                display: block;
+                padding: 0.45em 0.8em;
+                border-radius: 6px;
+                transition:
+                    background 0.2s,
+                    color 0.2s;
+            }
+            .sidebar nav ul li a:hover {
+                background: var(--hover-bg);
+                color: var(--link);
+            }
+            .sidebar nav ul li a.active {
+                background: var(--hover-bg);
+                color: var(--link);
+                font-weight: 500;
+                box-shadow: inset 3px 0 0 var(--link);
+            }
+            .random-link {
+                margin-top: 2em;
+                font-size: 0.9em;
+            }
+            .random-link a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+            .random-link a:hover {
+                color: var(--link);
+            }
+
+            /* ---------- MAIN CONTENT ---------- */
+            .content {
+                margin-left: 280px;
+                padding: 2.5em 3em;
+                max-width: 900px;
+                width: 100%;
+                background: var(--content-bg);
+                min-height: 100vh;
+                box-shadow: var(--shadow);
+                transition:
+                    background 0.3s ease,
+                    color 0.3s ease;
+            }
+            .content h1 {
+                font-size: 2.4em;
+                border-bottom: 1px solid var(--border);
+                margin-bottom: 0.5em;
+                padding-bottom: 0.2em;
+                font-family: "Linux Libertine", "Georgia", serif;
+                font-weight: normal;
+                letter-spacing: -0.5px;
+            }
+            .content h2 {
+                font-size: 1.6em;
+                margin-top: 1.4em;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 0.2em;
+            }
+            .content h3 {
+                font-size: 1.3em;
+                margin-top: 1.2em;
+            }
+            .content p {
+                margin: 0.8em 0;
+            }
+            .content a {
+                color: var(--link);
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+            .content a:hover {
+                text-decoration: underline;
+            }
+            .content a:visited {
+                color: var(--link-visited);
+            }
+            .content ul,
+            .content ol {
+                margin: 0.5em 0 0.5em 1.8em;
+            }
+            .content img {
+                max-width: 100%;
+                height: auto;
+                margin: 0.8em 0;
+                border-radius: 8px;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            }
+            .content blockquote {
+                margin: 1.2em 0;
+                padding: 0.8em 1.2em;
+                background: var(--blockquote-bg);
+                border-left: 4px solid var(--link);
+                border-radius: 0 6px 6px 0;
+                font-style: italic;
+                color: var(--text-secondary);
+            }
+            .content code {
+                background: var(--code-bg);
+                padding: 0.2em 0.4em;
+                border-radius: 4px;
+                font-family: "SF Mono", "Fira Code", monospace;
+                font-size: 0.9em;
+            }
+            .content pre {
+                background: var(--code-bg);
+                padding: 1em;
+                overflow-x: auto;
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                margin: 1.2em 0;
+            }
+            .content pre code {
+                background: none;
+                padding: 0;
+            }
+            .content hr {
+                border: none;
+                border-top: 1px solid var(--border);
+                margin: 1.5em 0;
+            }
+            .edit-link {
+                margin-top: 2.5em;
+                font-size: 0.85em;
+                border-top: 1px solid var(--border);
+                padding-top: 1.2em;
+                color: var(--text-secondary);
+            }
+            .edit-link a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+            .edit-link a:hover {
+                color: var(--link);
+            }
+            .home-message {
+                font-style: italic;
+                color: var(--text-secondary);
+            }
+
+            /* ---------- RESPONSIVE ---------- */
+            @media (max-width: 768px) {
+                body {
+                    flex-direction: column;
+                }
+                .sidebar {
+                    position: relative;
+                    width: 100%;
+                    border-right: none;
+                    border-bottom: 1px solid var(--border);
+                    padding: 0.8em 1em;
+                    max-height: 45vh;
+                    box-shadow: none;
+                }
+                .content {
+                    margin-left: 0;
+                    padding: 1.5em 1.2em;
+                    box-shadow: none;
+                }
+                .content h1 {
+                    font-size: 2em;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo"><a href="#">📖 My Wiki</a></div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <div class="toggle-thumb"></div>
+                </button>
+            </div>
+            <div class="search-box">
+                <input type="search" id="searchInput" placeholder="Search articles…" autocomplete="off" />
+            </div>
+            <nav>
+                <ul id="articleList"></ul>
+            </nav>
+            <div class="random-link">
+                <a href="#" id="randomArticleLink">🎲 Random article</a>
+            </div>
+        </aside>
+        <main class="content" id="mainContent">
+            <h1>Welcome</h1>
+            <p class="home-message">Select an article from the sidebar or use the search box.</p>
+        </main>
+
+        <script>
+            (function () {
+                // ---------- CONFIGURATION ----------
+                const wikiTitle = "My Wiki";
+                const repoOwner = "USER";
+                const repoName = "REPO";
+                const articlesDir = "articles";
+                // -----------------------------------
+
+                const articleListEl = document.getElementById("articleList");
+                const mainContentEl = document.getElementById("mainContent");
+                const searchInput = document.getElementById("searchInput");
+                const pageTitle = document.getElementById("pageTitle");
+                const randomLink = document.getElementById("randomArticleLink");
+                const themeToggle = document.getElementById("themeToggle");
+
+                let articles = [];
+                let currentSlug = null;
+
+                // ---------- THEME HANDLING ----------
+                function setTheme(theme) {
+                    document.documentElement.setAttribute("data-theme", theme);
+                    localStorage.setItem("wiki-theme", theme);
+                }
+                // Check stored preference, else system preference
+                const storedTheme = localStorage.getItem("wiki-theme");
+                if (storedTheme) {
+                    setTheme(storedTheme);
+                } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                    setTheme("dark");
+                }
+                themeToggle.addEventListener("click", () => {
+                    const current = document.documentElement.getAttribute("data-theme");
+                    setTheme(current === "dark" ? "light" : "dark");
+                });
+
+                // ---------- ARTICLE LIST ----------
+                async function loadArticleList() {
+                    try {
+                        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${articlesDir}`;
+                        const resp = await fetch(apiUrl);
+                        if (!resp.ok) throw new Error(`GitHub API error: ${resp.status}`);
+                        const files = await resp.json();
+
+                        articles = files
+                            .filter((f) => f.type === "file" && f.name.endsWith(".md"))
+                            .map((f) => {
+                                const slug = f.name.replace(/\.md$/, "");
+                                const title = slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+                                return { slug, title };
+                            })
+                            .sort((a, b) => a.title.localeCompare(b.title));
+
+                        renderSidebar();
+                        handleRoute();
+                    } catch (err) {
+                        console.error("Could not load article list:", err);
+                        articleListEl.innerHTML =
+                            "<li><em>Unable to load articles. Is the repository public?</em></li>";
+                    }
+                }
+
+                function renderSidebar(filterText = "") {
+                    const filtered = filterText
+                        ? articles.filter((a) => a.title.toLowerCase().includes(filterText.toLowerCase()))
+                        : articles;
+                    articleListEl.innerHTML = filtered
+                        .map(
+                            (a) =>
+                                `<li><a href="#/article/${a.slug}" data-slug="${a.slug}">${escapeHtml(a.title)}</a></li>`,
+                        )
+                        .join("");
+                    highlightActiveLink();
+                }
+
+                function highlightActiveLink() {
+                    document.querySelectorAll("#articleList a").forEach((link) => {
+                        link.classList.toggle("active", link.dataset.slug === currentSlug);
+                    });
+                }
+
+                function escapeHtml(text) {
+                    const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
+                    return text.replace(/[&<>"']/g, (m) => map[m]);
+                }
+
+                async function loadArticle(slug) {
+                    if (!slug) {
+                        mainContentEl.innerHTML = `
+            <h1>Welcome</h1>
+            <p class="home-message">Select an article from the sidebar or use the search box.</p>
+          `;
+                        currentSlug = null;
+                        document.title = wikiTitle;
+                        highlightActiveLink();
+                        return;
+                    }
+
+                    try {
+                        const rawUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${articlesDir}/${slug}.md`;
+                        const resp = await fetch(rawUrl);
+                        if (!resp.ok) throw new Error("Article not found");
+                        const markdown = await resp.text();
+                        const html = marked.parse(markdown);
+
+                        const titleMatch = markdown.match(/^#\s+(.+)/m);
+                        const articleTitle = titleMatch ? titleMatch[1] : slug.replace(/-/g, " ");
+                        document.title = `${articleTitle} – ${wikiTitle}`;
+
+                        const editUrl = `https://github.com/${repoOwner}/${repoName}/edit/main/${articlesDir}/${slug}.md`;
+                        mainContentEl.innerHTML = `
+            <article>${html}</article>
+            <div class="edit-link">
+              <a href="${editUrl}" target="_blank" rel="noopener">✏️ Edit this article on GitHub</a>
+            </div>
+          `;
+                        currentSlug = slug;
+                    } catch (err) {
+                        console.error(err);
+                        document.title = `Not found – ${wikiTitle}`;
+                        mainContentEl.innerHTML = `
+            <h1>Article not found</h1>
+            <p>The article “${escapeHtml(slug)}” does not exist yet.</p>
+            <div class="edit-link">
+              <a href="https://github.com/${repoOwner}/${repoName}/new/main/${articlesDir}?filename=${slug}.md" target="_blank" rel="noopener">
+                ➕ Create this article on GitHub
+              </a>
+            </div>
+          `;
+                        currentSlug = null;
+                    }
+                    highlightActiveLink();
+                }
+
+                function handleRoute() {
+                    const hash = window.location.hash.slice(1);
+                    const match = hash.match(/^\/article\/([^/]+)$/);
+                    const slug = match ? match[1] : null;
+                    loadArticle(slug);
+                }
+
+                window.addEventListener("hashchange", handleRoute);
+
+                articleListEl.addEventListener("click", (e) => {
+                    const link = e.target.closest("a");
+                    if (!link || !link.dataset.slug) return;
+                    e.preventDefault();
+                    window.location.hash = `#/article/${link.dataset.slug}`;
+                });
+
+                searchInput.addEventListener("input", (e) => {
+                    renderSidebar(e.target.value);
+                });
+
+                randomLink.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    if (articles.length === 0) return;
+                    const randomIndex = Math.floor(Math.random() * articles.length);
+                    window.location.hash = `#/article/${articles[randomIndex].slug}`;
+                });
+
+                // Kick off
+                loadArticleList();
+            })();
+        </script>
+    </body>
+</html>
