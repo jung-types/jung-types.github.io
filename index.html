@@ -529,13 +529,16 @@
                 function renderMarkdown(markdown) {
                     const renderer = new marked.Renderer();
                     renderer.link = (href, title, text) => {
-                        // If href is internal (no protocol, not starting with #, not mailto, etc.)
+                        // If the link is not an external URL, not an anchor, not a mailto, treat it as an internal wiki link
                         if (!/^(https?:|mailto:|#|\/\/)/.test(href)) {
-                            // Extract slug from href (handle ./ or ../)
-                            let cleanHref = href.replace(/^\.\/|^\.\.\//, "");
-                            // Remove any folder path, take basename
-                            let parts = cleanHref.split("/");
+                            // Remove any leading ./ or ../ (optional, but harmless)
+                            let cleanHref = href.replace(/^(\.\/|\.\.\/)+/, "");
+                            // Take the filename part (ignoring any directories)
+                            const parts = cleanHref.split("/");
                             let slug = parts[parts.length - 1].replace(/\.md$/, "");
+                            // If slug is empty (e.g., link to a folder), fallback to raw href
+                            if (!slug) slug = cleanHref;
+                            // Build the hash link
                             href = `#/article/${slug}`;
                         }
                         return `<a href="${href}"${title ? ` title="${title}"` : ""}>${text}</a>`;
