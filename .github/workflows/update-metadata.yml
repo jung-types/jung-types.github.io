@@ -1,0 +1,29 @@
+name: Update Articles Metadata
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "articles/**"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+            - name: Generate metadata
+              run: node generate-metadata.js
+            - name: Commit changes
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add articles/articles-metadata.json
+                  git diff --quiet && git diff --staged --quiet || git commit -m "Update articles metadata"
+                  git push
