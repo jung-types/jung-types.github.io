@@ -1,638 +1,679 @@
 <!doctype html>
 <html lang="en" data-theme="light">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title id="pageTitle">My Wiki</title>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-        <style>
-            /* ---------- THEME VARIABLES ---------- */
-            :root {
-                --bg: #f6f6f6;
-                --sidebar-bg: #f8f9fa;
-                --content-bg: #ffffff;
-                --text: #202122;
-                --text-secondary: #54595d;
-                --border: #a2a9b1;
-                --link: #0645ad;
-                --link-visited: #0b0080;
-                --hover-bg: #eaf3ff;
-                --code-bg: #f7f7f7;
-                --blockquote-bg: #f9f9f9;
-                --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-                --sidebar-shadow: -2px 0 8px rgba(0, 0, 0, 0.05);
-                --input-bg: #ffffff;
-                --toggle-bg: #e9ecef;
-                --toggle-color: #495057;
-                --filter-bg: #ffffff;
-            }
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="pageTitle">My Wiki</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* ---------- THEME VARIABLES ---------- */
+        :root {
+            --bg: #f6f6f6;
+            --sidebar-bg: #f8f9fa;
+            --content-bg: #ffffff;
+            --text: #202122;
+            --text-secondary: #54595d;
+            --border: #a2a9b1;
+            --link: #0645ad;
+            --link-visited: #0b0080;
+            --hover-bg: #eaf3ff;
+            --code-bg: #f7f7f7;
+            --blockquote-bg: #f9f9f9;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --sidebar-shadow: -2px 0 8px rgba(0, 0, 0, 0.05);
+            --input-bg: #ffffff;
+            --toggle-bg: #e9ecef;
+            --toggle-color: #495057;
+            --filter-bg: #ffffff;
+        }
 
-            [data-theme="dark"] {
-                --bg: #1a1a1a;
-                --sidebar-bg: #232323;
-                --content-bg: #2b2b2b;
-                --text: #e0e0e0;
-                --text-secondary: #b0b0b0;
-                --border: #4a4a4a;
-                --link: #6ea8fe;
-                --link-visited: #b388ff;
-                --hover-bg: #3a3a3a;
-                --code-bg: #363636;
-                --blockquote-bg: #333333;
-                --shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-                --sidebar-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
-                --input-bg: #333333;
-                --toggle-bg: #4a4a4a;
-                --toggle-color: #f1f1f1;
-                --filter-bg: #333333;
-            }
+        [data-theme="dark"] {
+            --bg: #1a1a1a;
+            --sidebar-bg: #232323;
+            --content-bg: #2b2b2b;
+            --text: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border: #4a4a4a;
+            --link: #6ea8fe;
+            --link-visited: #b388ff;
+            --hover-bg: #3a3a3a;
+            --code-bg: #363636;
+            --blockquote-bg: #333333;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            --sidebar-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+            --input-bg: #333333;
+            --toggle-bg: #4a4a4a;
+            --toggle-color: #f1f1f1;
+            --filter-bg: #333333;
+        }
 
-            /* ---------- RESET & BASE ---------- */
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                font-size: 16px;
-                line-height: 1.6;
-                color: var(--text);
-                background: var(--bg);
-                display: flex;
-                min-height: 100vh;
-                transition:
-                    background 0.3s ease,
-                    color 0.3s ease;
-            }
+        /* ---------- RESET & BASE ---------- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            display: flex;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
 
-            /* ---------- SIDEBAR ---------- */
+        /* ---------- SIDEBAR ---------- */
+        .sidebar {
+            width: 300px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 1.2em 1em;
+            position: fixed;
+            top: 0; bottom: 0;
+            overflow-y: auto;
+            box-shadow: var(--sidebar-shadow);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1em;
+        }
+        .sidebar .logo {
+            font-size: 1.6em;
+            font-family: "Linux Libertine", "Georgia", serif;
+            font-weight: bold;
+            letter-spacing: -0.5px;
+        }
+        .sidebar .logo a { text-decoration: none; color: var(--text); transition: color 0.2s; }
+        .sidebar .logo a:hover { color: var(--link); }
+        .theme-toggle {
+            background: var(--toggle-bg);
+            border: none;
+            border-radius: 20px;
+            width: 40px;
+            height: 24px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            padding: 0 2px;
+        }
+        .theme-toggle .toggle-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--toggle-color);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        [data-theme="dark"] .theme-toggle .toggle-thumb { transform: translateX(16px); }
+
+        /* Filters area */
+        .filters {
+            margin-bottom: 1.5em;
+        }
+        .filter-group {
+            margin-bottom: 0.8em;
+        }
+        .filter-group label {
+            display: block;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 0.3em;
+            color: var(--text-secondary);
+        }
+        .search-box input[type="search"] {
+            width: 100%;
+            padding: 0.5em 0.8em;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text);
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+        }
+        .search-box input[type="search"]:focus {
+            outline: none;
+            border-color: var(--link);
+            box-shadow: 0 0 0 3px rgba(6, 69, 173, 0.15);
+        }
+
+        /* Category list (new) */
+        .category-list {
+            list-style: none;
+            padding: 0;
+        }
+        .category-list li {
+            margin-bottom: 0.2em;
+        }
+        .category-list li a {
+            text-decoration: none;
+            color: var(--text);
+            font-size: 0.95em;
+            display: block;
+            padding: 0.45em 0.8em;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .category-list li a:hover,
+        .category-list li a.active {
+            background: var(--hover-bg);
+            color: var(--link);
+        }
+        .category-list li a.active {
+            font-weight: 500;
+            box-shadow: inset 3px 0 0 var(--link);
+        }
+
+        .tag-filter-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4em;
+        }
+        .tag-filter-list label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            background: var(--filter-bg);
+            border: 1px solid var(--border);
+            padding: 0.2em 0.6em;
+            border-radius: 20px;
+            font-size: 0.8em;
+            user-select: none;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .tag-filter-list label:hover {
+            border-color: var(--link);
+        }
+        .tag-filter-list input[type="checkbox"] {
+            margin-right: 0.3em;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 0.2em;
+        }
+        .sidebar nav ul li a {
+            text-decoration: none;
+            color: var(--text);
+            font-size: 0.95em;
+            display: block;
+            padding: 0.45em 0.8em;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            background: var(--hover-bg);
+            color: var(--link);
+        }
+        .sidebar nav ul li a.active {
+            font-weight: 500;
+            box-shadow: inset 3px 0 0 var(--link);
+        }
+        .random-link {
+            margin-top: 2em;
+            font-size: 0.9em;
+        }
+        .random-link a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .random-link a:hover { color: var(--link); }
+
+        /* ---------- MAIN CONTENT ---------- */
+        .content {
+            margin-left: 300px;
+            padding: 2.5em 3em;
+            max-width: 900px;
+            width: 100%;
+            background: var(--content-bg);
+            min-height: 100vh;
+            box-shadow: var(--shadow);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .content h1 {
+            font-size: 2.4em;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0.5em;
+            padding-bottom: 0.2em;
+            font-family: "Linux Libertine", "Georgia", serif;
+            font-weight: normal;
+            letter-spacing: -0.5px;
+        }
+        .content h2 {
+            font-size: 1.6em;
+            margin-top: 1.4em;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.2em;
+        }
+        .content h3 { font-size: 1.3em; margin-top: 1.2em; }
+        .content p { margin: 0.8em 0; }
+        .content a { color: var(--link); text-decoration: none; transition: color 0.2s; }
+        .content a:hover { text-decoration: underline; }
+        .content a:visited { color: var(--link-visited); }
+        .content ul, .content ol { margin: 0.5em 0 0.5em 1.8em; }
+        .content img {
+            max-width: 100%;
+            height: auto;
+            margin: 0.8em 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .content blockquote {
+            margin: 1.2em 0;
+            padding: 0.8em 1.2em;
+            background: var(--blockquote-bg);
+            border-left: 4px solid var(--link);
+            border-radius: 0 6px 6px 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+        .content code {
+            background: var(--code-bg);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: "SF Mono", "Fira Code", monospace;
+            font-size: 0.9em;
+        }
+        .content pre {
+            background: var(--code-bg);
+            padding: 1em;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin: 1.2em 0;
+        }
+        .content pre code { background: none; padding: 0; }
+        .content hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 1.5em 0;
+        }
+        .edit-link {
+            margin-top: 2.5em;
+            font-size: 0.85em;
+            border-top: 1px solid var(--border);
+            padding-top: 1.2em;
+            color: var(--text-secondary);
+        }
+        .edit-link a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .edit-link a:hover { color: var(--link); }
+        .home-message { font-style: italic; color: var(--text-secondary); }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
             .sidebar {
-                width: 300px;
-                background: var(--sidebar-bg);
-                border-right: 1px solid var(--border);
-                padding: 1.2em 1em;
-                position: fixed;
-                top: 0;
-                bottom: 0;
-                overflow-y: auto;
-                box-shadow: var(--sidebar-shadow);
-                transition:
-                    background 0.3s ease,
-                    border-color 0.3s ease;
-            }
-            .sidebar-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1em;
-            }
-            .sidebar .logo {
-                font-size: 1.6em;
-                font-family: "Linux Libertine", "Georgia", serif;
-                font-weight: bold;
-                letter-spacing: -0.5px;
-            }
-            .sidebar .logo a {
-                text-decoration: none;
-                color: var(--text);
-                transition: color 0.2s;
-            }
-            .sidebar .logo a:hover {
-                color: var(--link);
-            }
-            .theme-toggle {
-                background: var(--toggle-bg);
-                border: none;
-                border-radius: 20px;
-                width: 40px;
-                height: 24px;
-                cursor: pointer;
                 position: relative;
-                transition: background 0.3s;
-                display: flex;
-                align-items: center;
-                padding: 0 2px;
-            }
-            .theme-toggle .toggle-thumb {
-                width: 20px;
-                height: 20px;
-                background: var(--toggle-color);
-                border-radius: 50%;
-                transition: transform 0.3s ease;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-            }
-            [data-theme="dark"] .theme-toggle .toggle-thumb {
-                transform: translateX(16px);
-            }
-
-            /* Filters area */
-            .filters {
-                margin-bottom: 1.5em;
-            }
-            .filter-group {
-                margin-bottom: 0.8em;
-            }
-            .filter-group label {
-                display: block;
-                font-size: 0.85em;
-                font-weight: 600;
-                margin-bottom: 0.3em;
-                color: var(--text-secondary);
-            }
-            .search-box input[type="search"],
-            .filter-group select {
                 width: 100%;
-                padding: 0.5em 0.8em;
-                border: 1px solid var(--border);
-                border-radius: 6px;
-                background: var(--input-bg);
-                color: var(--text);
-                font-family: inherit;
-                transition:
-                    border-color 0.3s,
-                    box-shadow 0.3s,
-                    background 0.3s;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 0.8em 1em;
+                max-height: 50vh;
+                box-shadow: none;
             }
-            .search-box input[type="search"]:focus,
-            .filter-group select:focus {
-                outline: none;
-                border-color: var(--link);
-                box-shadow: 0 0 0 3px rgba(6, 69, 173, 0.15);
-            }
-            .tag-filter-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.4em;
-            }
-            .tag-filter-list label {
-                display: inline-flex;
-                align-items: center;
-                cursor: pointer;
-                background: var(--filter-bg);
-                border: 1px solid var(--border);
-                padding: 0.2em 0.6em;
-                border-radius: 20px;
-                font-size: 0.8em;
-                user-select: none;
-                transition:
-                    background 0.2s,
-                    border-color 0.2s;
-            }
-            .tag-filter-list label:hover {
-                border-color: var(--link);
-            }
-            .tag-filter-list input[type="checkbox"] {
-                margin-right: 0.3em;
-            }
-
-            .sidebar nav ul {
-                list-style: none;
-                padding: 0;
-            }
-            .sidebar nav ul li {
-                margin-bottom: 0.2em;
-            }
-            .sidebar nav ul li a {
-                text-decoration: none;
-                color: var(--text);
-                font-size: 0.95em;
-                display: block;
-                padding: 0.45em 0.8em;
-                border-radius: 6px;
-                transition:
-                    background 0.2s,
-                    color 0.2s;
-            }
-            .sidebar nav ul li a:hover {
-                background: var(--hover-bg);
-                color: var(--link);
-            }
-            .sidebar nav ul li a.active {
-                background: var(--hover-bg);
-                color: var(--link);
-                font-weight: 500;
-                box-shadow: inset 3px 0 0 var(--link);
-            }
-            .random-link {
-                margin-top: 2em;
-                font-size: 0.9em;
-            }
-            .random-link a {
-                color: var(--text-secondary);
-                text-decoration: none;
-                transition: color 0.2s;
-            }
-            .random-link a:hover {
-                color: var(--link);
-            }
-
-            /* ---------- MAIN CONTENT ---------- */
             .content {
-                margin-left: 300px;
-                padding: 2.5em 3em;
-                max-width: 900px;
-                width: 100%;
-                background: var(--content-bg);
-                min-height: 100vh;
-                box-shadow: var(--shadow);
-                transition:
-                    background 0.3s ease,
-                    color 0.3s ease;
+                margin-left: 0;
+                padding: 1.5em 1.2em;
+                box-shadow: none;
             }
-            .content h1 {
-                font-size: 2.4em;
-                border-bottom: 1px solid var(--border);
-                margin-bottom: 0.5em;
-                padding-bottom: 0.2em;
-                font-family: "Linux Libertine", "Georgia", serif;
-                font-weight: normal;
-                letter-spacing: -0.5px;
-            }
-            .content h2 {
-                font-size: 1.6em;
-                margin-top: 1.4em;
-                border-bottom: 1px solid var(--border);
-                padding-bottom: 0.2em;
-            }
-            .content h3 {
-                font-size: 1.3em;
-                margin-top: 1.2em;
-            }
-            .content p {
-                margin: 0.8em 0;
-            }
-            .content a {
-                color: var(--link);
-                text-decoration: none;
-                transition: color 0.2s;
-            }
-            .content a:hover {
-                text-decoration: underline;
-            }
-            .content a:visited {
-                color: var(--link-visited);
-            }
-            .content ul,
-            .content ol {
-                margin: 0.5em 0 0.5em 1.8em;
-            }
-            .content img {
-                max-width: 100%;
-                height: auto;
-                margin: 0.8em 0;
-                border-radius: 8px;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            }
-            .content blockquote {
-                margin: 1.2em 0;
-                padding: 0.8em 1.2em;
-                background: var(--blockquote-bg);
-                border-left: 4px solid var(--link);
-                border-radius: 0 6px 6px 0;
-                font-style: italic;
-                color: var(--text-secondary);
-            }
-            .content code {
-                background: var(--code-bg);
-                padding: 0.2em 0.4em;
-                border-radius: 4px;
-                font-family: "SF Mono", "Fira Code", monospace;
-                font-size: 0.9em;
-            }
-            .content pre {
-                background: var(--code-bg);
-                padding: 1em;
-                overflow-x: auto;
-                border: 1px solid var(--border);
-                border-radius: 6px;
-                margin: 1.2em 0;
-            }
-            .content pre code {
-                background: none;
-                padding: 0;
-            }
-            .content hr {
-                border: none;
-                border-top: 1px solid var(--border);
-                margin: 1.5em 0;
-            }
-            .edit-link {
-                margin-top: 2.5em;
-                font-size: 0.85em;
-                border-top: 1px solid var(--border);
-                padding-top: 1.2em;
-                color: var(--text-secondary);
-            }
-            .edit-link a {
-                color: var(--text-secondary);
-                text-decoration: none;
-                transition: color 0.2s;
-            }
-            .edit-link a:hover {
-                color: var(--link);
-            }
-            .home-message {
-                font-style: italic;
-                color: var(--text-secondary);
-            }
-
-            /* ---------- RESPONSIVE ---------- */
-            @media (max-width: 768px) {
-                body {
-                    flex-direction: column;
-                }
-                .sidebar {
-                    position: relative;
-                    width: 100%;
-                    border-right: none;
-                    border-bottom: 1px solid var(--border);
-                    padding: 0.8em 1em;
-                    max-height: 50vh;
-                    box-shadow: none;
-                }
-                .content {
-                    margin-left: 0;
-                    padding: 1.5em 1.2em;
-                    box-shadow: none;
-                }
-                .content h1 {
-                    font-size: 2em;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo"><a href="#">📖 My Wiki</a></div>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                    <div class="toggle-thumb"></div>
-                </button>
+            .content h1 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo"><a href="#">📖 My Wiki</a></div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <div class="toggle-thumb"></div>
+            </button>
+        </div>
+        <div class="filters">
+            <div class="filter-group search-box">
+                <input type="search" id="searchInput" placeholder="Search articles…" autocomplete="off" />
             </div>
-            <div class="filters">
-                <div class="filter-group search-box">
-                    <input type="search" id="searchInput" placeholder="Search articles…" autocomplete="off" />
-                </div>
-                <div class="filter-group">
-                    <label for="categoryFilter">Category</label>
-                    <select id="categoryFilter">
-                        <option value="">All categories</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Tags</label>
-                    <div class="tag-filter-list" id="tagFilters"></div>
-                </div>
+            <!-- Categories (replaces the dropdown) -->
+            <div class="filter-group">
+                <label>Categories</label>
+                <ul class="category-list" id="categoryList">
+                    <li><a href="#/" data-category="">All articles</a></li>
+                    <!-- will be populated -->
+                </ul>
             </div>
-            <nav>
-                <ul id="articleList"></ul>
-            </nav>
-            <div class="random-link">
-                <a href="#" id="randomArticleLink">🎲 Random article</a>
+            <div class="filter-group">
+                <label>Tags</label>
+                <div class="tag-filter-list" id="tagFilters"></div>
             </div>
-        </aside>
-        <main class="content" id="mainContent">
-            <h1>Welcome</h1>
-            <p class="home-message">Select an article from the sidebar or use the filters.</p>
-        </main>
+        </div>
+        <nav>
+            <ul id="articleList"></ul>
+        </nav>
+        <div class="random-link">
+            <a href="#" id="randomArticleLink">🎲 Random article</a>
+        </div>
+    </aside>
+    <main class="content" id="mainContent">
+        <h1>Welcome</h1>
+        <p class="home-message">Select an article from the sidebar or use the filters.</p>
+    </main>
 
-        <script>
-            (function () {
-                // ---------- CONFIGURATION ----------
-                const wikiTitle = "Post-Jungian Typology Wiki";
-                const repoOwner = "jung-types";
-                const repoName = "jung-types.github.io";
-                const articlesDir = "articles";
-                const metadataFile = "articles-metadata.json"; // Will be generated automatically
-                // -----------------------------------
+    <script>
+        (function () {
+            // ---------- CONFIGURATION ----------
+            const wikiTitle = "Post-Jungian Typology Wiki";
+            const repoOwner = "jung-types";
+            const repoName = "jung-types.github.io";
+            const articlesDir = "articles";
+            const metadataFile = "articles-metadata.json";
+            const categoriesDir = "articles/_categories"; // folder for category pages
+            // -----------------------------------
 
-                const articleListEl = document.getElementById("articleList");
-                const mainContentEl = document.getElementById("mainContent");
-                const searchInput = document.getElementById("searchInput");
-                const categoryFilter = document.getElementById("categoryFilter");
-                const tagFiltersContainer = document.getElementById("tagFilters");
-                const pageTitle = document.getElementById("pageTitle");
-                const randomLink = document.getElementById("randomArticleLink");
-                const themeToggle = document.getElementById("themeToggle");
+            const articleListEl = document.getElementById("articleList");
+            const mainContentEl = document.getElementById("mainContent");
+            const searchInput = document.getElementById("searchInput");
+            const categoryListEl = document.getElementById("categoryList");
+            const tagFiltersContainer = document.getElementById("tagFilters");
+            const pageTitle = document.getElementById("pageTitle");
+            const randomLink = document.getElementById("randomArticleLink");
+            const themeToggle = document.getElementById("themeToggle");
 
-                let articlesMetadata = []; // Array of { slug, title, category, tags, path }
-                let currentSlug = null;
-                let selectedTags = new Set(); // Set of tag strings
+            let articlesMetadata = [];
+            let currentSlug = null;
+            let selectedCategory = '';   // currently active category for filtering
+            let selectedTags = new Set();
 
-                // ---------- THEME HANDLING ----------
-                function setTheme(theme) {
-                    document.documentElement.setAttribute("data-theme", theme);
-                    localStorage.setItem("wiki-theme", theme);
+            // ---------- THEME HANDLING ----------
+            function setTheme(theme) {
+                document.documentElement.setAttribute("data-theme", theme);
+                localStorage.setItem("wiki-theme", theme);
+            }
+            const storedTheme = localStorage.getItem("wiki-theme");
+            if (storedTheme) {
+                setTheme(storedTheme);
+            } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                setTheme("dark");
+            }
+            themeToggle.addEventListener("click", () => {
+                const current = document.documentElement.getAttribute("data-theme");
+                setTheme(current === "dark" ? "light" : "dark");
+            });
+
+            // ---------- METADATA LOADING ----------
+            async function loadMetadata() {
+                try {
+                    const metadataUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${articlesDir}/${metadataFile}`;
+                    const resp = await fetch(metadataUrl);
+                    if (!resp.ok) throw new Error(`Metadata file not found: ${resp.status}`);
+                    articlesMetadata = await resp.json();
+                    articlesMetadata.sort((a, b) => a.title.localeCompare(b.title));
+                    populateFilters();
+                    renderSidebar();
+                    handleRoute();
+                } catch (err) {
+                    console.error("Could not load metadata:", err);
+                    articleListEl.innerHTML = "<li><em>Unable to load articles metadata.</em></li>";
                 }
-                const storedTheme = localStorage.getItem("wiki-theme");
-                if (storedTheme) {
-                    setTheme(storedTheme);
-                } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-                    setTheme("dark");
-                }
-                themeToggle.addEventListener("click", () => {
-                    const current = document.documentElement.getAttribute("data-theme");
-                    setTheme(current === "dark" ? "light" : "dark");
-                });
+            }
 
-                // ---------- METADATA LOADING ----------
-                async function loadMetadata() {
-                    try {
-                        const metadataUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${articlesDir}/${metadataFile}`;
-                        const resp = await fetch(metadataUrl);
-                        if (!resp.ok) throw new Error(`Metadata file not found: ${resp.status}`);
-                        articlesMetadata = await resp.json();
-                        // Sort by title
-                        articlesMetadata.sort((a, b) => a.title.localeCompare(b.title));
-                        populateFilters();
-                        renderSidebar();
-                        handleRoute();
-                    } catch (err) {
-                        console.error("Could not load metadata:", err);
-                        articleListEl.innerHTML = "<li><em>Unable to load articles metadata.</em></li>";
-                    }
-                }
+            function populateFilters() {
+                // Categories (based on article folders)
+                const categories = [...new Set(articlesMetadata.map(a => a.category))].sort();
+                categoryListEl.innerHTML = '<li><a href="#/" data-category="">All articles</a></li>' +
+                    categories.map(c => `<li><a href="#/category/${encodeURIComponent(c)}" data-category="${escapeHtml(c)}">${escapeHtml(c)}</a></li>`).join("");
 
-                function populateFilters() {
-                    // Categories
-                    const categories = [...new Set(articlesMetadata.map((a) => a.category))].sort();
-                    categoryFilter.innerHTML =
-                        '<option value="">All categories</option>' +
-                        categories.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
-
-                    // Tags
-                    const allTags = new Set();
-                    articlesMetadata.forEach((a) => (a.tags || []).forEach((t) => allTags.add(t)));
-                    const sortedTags = [...allTags].sort();
-                    tagFiltersContainer.innerHTML = sortedTags
-                        .map(
-                            (tag) => `
+                // Tags (unchanged)
+                const allTags = new Set();
+                articlesMetadata.forEach(a => (a.tags || []).forEach(t => allTags.add(t)));
+                const sortedTags = [...allTags].sort();
+                tagFiltersContainer.innerHTML = sortedTags.map(tag => `
                     <label>
                         <input type="checkbox" value="${escapeHtml(tag)}" class="tag-checkbox">
                         ${escapeHtml(tag)}
                     </label>
-                `,
-                        )
-                        .join("");
+                `).join("");
 
-                    // Attach events
-                    document.querySelectorAll(".tag-checkbox").forEach((cb) => {
-                        cb.addEventListener("change", (e) => {
-                            if (e.target.checked) selectedTags.add(e.target.value);
-                            else selectedTags.delete(e.target.value);
-                            renderSidebar();
-                        });
+                document.querySelectorAll(".tag-checkbox").forEach(cb => {
+                    cb.addEventListener("change", (e) => {
+                        if (e.target.checked) selectedTags.add(e.target.value);
+                        else selectedTags.delete(e.target.value);
+                        renderSidebar();
                     });
-                }
+                });
 
-                function renderSidebar() {
-                    const searchTerm = searchInput.value.toLowerCase();
-                    const selectedCategory = categoryFilter.value;
-
-                    const filtered = articlesMetadata.filter((a) => {
-                        // Category filter
-                        if (selectedCategory && a.category !== selectedCategory) return false;
-                        // Tag filter (article must have all selected tags)
-                        if (selectedTags.size > 0) {
-                            const articleTags = a.tags || [];
-                            for (const tag of selectedTags) {
-                                if (!articleTags.includes(tag)) return false;
-                            }
+                // Attach click handlers to category links
+                categoryListEl.querySelectorAll("a[data-category]").forEach(link => {
+                    link.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        const cat = link.dataset.category;
+                        if (cat === "") {
+                            // Go to home (all articles)
+                            window.location.hash = "#/";
+                        } else {
+                            window.location.hash = `#/category/${encodeURIComponent(cat)}`;
                         }
-                        // Search filter
-                        if (searchTerm && !a.title.toLowerCase().includes(searchTerm)) return false;
-                        return true;
                     });
+                });
+            }
 
-                    articleListEl.innerHTML = filtered
-                        .map(
-                            (a) =>
-                                `<li><a href="#/article/${a.slug}" data-slug="${a.slug}">${escapeHtml(a.title)}</a></li>`,
-                        )
-                        .join("");
-                    highlightActiveLink();
-                }
+            function renderSidebar() {
+                const searchTerm = searchInput.value.toLowerCase();
 
-                function highlightActiveLink() {
-                    document.querySelectorAll("#articleList a").forEach((link) => {
-                        link.classList.toggle("active", link.dataset.slug === currentSlug);
-                    });
-                }
-
-                function escapeHtml(text) {
-                    const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
-                    return text.replace(/[&<>"']/g, (m) => map[m]);
-                }
-
-                // ---------- MARKDOWN RENDERING WITH RELATIVE LINKS ----------
-                function renderMarkdown(markdown) {
-                    const renderer = new marked.Renderer();
-                    renderer.link = (href, title, text) => {
-                        // If the link is not an external URL, not an anchor, not a mailto, treat it as an internal wiki link
-                        if (!/^(https?:|mailto:|#|\/\/)/.test(href)) {
-                            // Remove any leading ./ or ../ (optional, but harmless)
-                            let cleanHref = href.replace(/^(\.\/|\.\.\/)+/, "");
-                            // Take the filename part (ignoring any directories)
-                            const parts = cleanHref.split("/");
-                            let slug = parts[parts.length - 1].replace(/\.md$/, "");
-                            // If slug is empty (e.g., link to a folder), fallback to raw href
-                            if (!slug) slug = cleanHref;
-                            // Build the hash link
-                            href = `#/article/${slug}`;
+                const filtered = articlesMetadata.filter(a => {
+                    if (selectedCategory && a.category !== selectedCategory) return false;
+                    if (selectedTags.size > 0) {
+                        const articleTags = a.tags || [];
+                        for (const tag of selectedTags) {
+                            if (!articleTags.includes(tag)) return false;
                         }
-                        return `<a href="${href}"${title ? ` title="${title}"` : ""}>${text}</a>`;
-                    };
-                    return marked.parse(markdown, { renderer });
-                }
+                    }
+                    if (searchTerm && !a.title.toLowerCase().includes(searchTerm)) return false;
+                    return true;
+                });
 
-                // ---------- ARTICLE LOADING ----------
-                async function loadArticle(slug) {
-                    if (!slug) {
-                        mainContentEl.innerHTML = `
+                articleListEl.innerHTML = filtered.map(a =>
+                    `<li><a href="#/article/${a.slug}" data-slug="${a.slug}">${escapeHtml(a.title)}</a></li>`
+                ).join("");
+                highlightActiveLink();
+
+                // Highlight the active category link
+                document.querySelectorAll("#categoryList a").forEach(link => {
+                    link.classList.toggle("active", link.dataset.category === selectedCategory);
+                });
+            }
+
+            function highlightActiveLink() {
+                document.querySelectorAll("#articleList a").forEach(link => {
+                    link.classList.toggle("active", link.dataset.slug === currentSlug);
+                });
+            }
+
+            function escapeHtml(text) {
+                const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
+                return text.replace(/[&<>"']/g, m => map[m]);
+            }
+
+            // ---------- MARKDOWN RENDERING (same as before, links relative to articles root) ----------
+            function renderMarkdown(markdown) {
+                const renderer = new marked.Renderer();
+                renderer.link = (href, title, text) => {
+                    if (!/^(https?:|mailto:|#|\/\/)/.test(href)) {
+                        let cleanHref = href.replace(/^(\.\/|\.\.\/)+/, '');
+                        const parts = cleanHref.split('/');
+                        let slug = parts[parts.length - 1].replace(/\.md$/, '');
+                        if (!slug) slug = cleanHref;
+                        href = `#/article/${slug}`;
+                    }
+                    return `<a href="${href}"${title ? ` title="${title}"` : ''}>${text}</a>`;
+                };
+                return marked.parse(markdown, { renderer });
+            }
+
+            // ---------- ARTICLE LOADING (unchanged mostly) ----------
+            async function loadArticle(slug) {
+                if (!slug) {
+                    // Home page: show welcome
+                    mainContentEl.innerHTML = `
                         <h1>Welcome</h1>
                         <p class="home-message">Select an article from the sidebar or use the filters.</p>
                     `;
-                        currentSlug = null;
-                        document.title = wikiTitle;
-                        highlightActiveLink();
-                        return;
-                    }
+                    currentSlug = null;
+                    document.title = wikiTitle;
+                    highlightActiveLink();
+                    return;
+                }
 
-                    // Find article metadata
-                    const meta = articlesMetadata.find((a) => a.slug === slug);
-                    if (!meta) {
-                        document.title = `Not found – ${wikiTitle}`;
-                        mainContentEl.innerHTML = `
+                const meta = articlesMetadata.find(a => a.slug === slug);
+                if (!meta) {
+                    document.title = `Not found – ${wikiTitle}`;
+                    mainContentEl.innerHTML = `
                         <h1>Article not found</h1>
                         <p>The article “${escapeHtml(slug)}” does not exist.</p>
                     `;
-                        currentSlug = null;
-                        highlightActiveLink();
-                        return;
-                    }
+                    currentSlug = null;
+                    highlightActiveLink();
+                    return;
+                }
 
-                    try {
-                        // Load raw Markdown from repo using path from metadata
-                        const rawUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${articlesDir}/${meta.path}`;
-                        const resp = await fetch(rawUrl);
-                        if (!resp.ok) throw new Error("Article file not found");
-                        const markdown = await resp.text();
-                        const html = renderMarkdown(markdown);
+                try {
+                    const rawUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${articlesDir}/${meta.path}`;
+                    const resp = await fetch(rawUrl);
+                    if (!resp.ok) throw new Error("Article file not found");
+                    const markdown = await resp.text();
+                    const html = renderMarkdown(markdown);
 
-                        const titleMatch = markdown.match(/^#\s+(.+)/m);
-                        const articleTitle = titleMatch ? titleMatch[1] : meta.title;
-                        document.title = `${articleTitle} – ${wikiTitle}`;
+                    const titleMatch = markdown.match(/^#\s+(.+)/m);
+                    const articleTitle = titleMatch ? titleMatch[1] : meta.title;
+                    document.title = `${articleTitle} – ${wikiTitle}`;
 
-                        const editUrl = `https://github.com/${repoOwner}/${repoName}/edit/main/${articlesDir}/${meta.path}`;
-                        mainContentEl.innerHTML = `
+                    const editUrl = `https://github.com/${repoOwner}/${repoName}/edit/main/${articlesDir}/${meta.path}`;
+                    mainContentEl.innerHTML = `
                         <article>${html}</article>
                         <div class="edit-link">
                             <a href="${editUrl}" target="_blank" rel="noopener">✏️ Edit this article on GitHub</a>
                         </div>
                     `;
-                        currentSlug = slug;
-                    } catch (err) {
-                        console.error(err);
-                        document.title = `Error – ${wikiTitle}`;
-                        mainContentEl.innerHTML = `
-                        <h1>Error loading article</h1>
-                        <p>Could not load the requested article.</p>
-                    `;
-                        currentSlug = null;
+                    currentSlug = slug;
+                } catch (err) {
+                    console.error(err);
+                    document.title = `Error – ${wikiTitle}`;
+                    mainContentEl.innerHTML = `<h1>Error loading article</h1><p>Could not load the requested article.</p>`;
+                    currentSlug = null;
+                }
+                highlightActiveLink();
+            }
+
+            // ---------- CATEGORY LOADING (new) ----------
+            async function loadCategory(categorySlug) {
+                // categorySlug is decoded already
+                selectedCategory = categorySlug;
+                renderSidebar();  // update article list filter
+
+                // Build list of articles in this category
+                const categoryArticles = articlesMetadata.filter(a => a.category === categorySlug);
+
+                // Attempt to load custom category page
+                const categoryMarkdownPath = `${categoriesDir}/${categorySlug}.md`;
+                let categoryHtml = '';
+                try {
+                    const rawUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${categoryMarkdownPath}`;
+                    const resp = await fetch(rawUrl);
+                    if (resp.ok) {
+                        const markdown = await resp.text();
+                        categoryHtml = renderMarkdown(markdown);
+                        // Optionally extract title
+                        const titleMatch = markdown.match(/^#\s+(.+)/m);
+                        if (titleMatch) document.title = `${titleMatch[1]} – ${wikiTitle}`;
+                        else document.title = `${categorySlug} – ${wikiTitle}`;
+                    } else {
+                        // No custom page; fallback title
+                        document.title = `${categorySlug} – ${wikiTitle}`;
                     }
-                    highlightActiveLink();
+                } catch (err) {
+                    console.warn("Could not load category page:", err);
+                    document.title = `${categorySlug} – ${wikiTitle}`;
                 }
 
-                function handleRoute() {
-                    const hash = window.location.hash.slice(1);
-                    const match = hash.match(/^\/article\/([^/]+)$/);
-                    const slug = match ? match[1] : null;
-                    loadArticle(slug);
+                // If no custom page, create a default heading
+                if (!categoryHtml) {
+                    categoryHtml = `<h1>${escapeHtml(categorySlug)}</h1>`;
                 }
 
-                window.addEventListener("hashchange", handleRoute);
+                // Append list of articles
+                const listHtml = categoryArticles.length > 0
+                    ? `<h2>Articles in this category</h2><ul>` +
+                      categoryArticles.map(a => `<li><a href="#/article/${a.slug}">${escapeHtml(a.title)}</a></li>`).join("") +
+                      `</ul>`
+                    : `<p><em>No articles in this category yet.</em></p>`;
 
-                articleListEl.addEventListener("click", (e) => {
-                    const link = e.target.closest("a");
-                    if (!link || !link.dataset.slug) return;
-                    e.preventDefault();
-                    window.location.hash = `#/article/${link.dataset.slug}`;
-                });
+                const editUrl = `https://github.com/${repoOwner}/${repoName}/edit/main/${categoryMarkdownPath}`;
+                const createUrl = `https://github.com/${repoOwner}/${repoName}/new/main/${categoriesDir}?filename=${categorySlug}.md`;
 
-                searchInput.addEventListener("input", renderSidebar);
-                categoryFilter.addEventListener("change", renderSidebar);
+                mainContentEl.innerHTML = `
+                    <article>${categoryHtml}</article>
+                    ${listHtml}
+                    <div class="edit-link">
+                        ${categoryHtml.includes('<h1>') ? 
+                            `<a href="${editUrl}" target="_blank" rel="noopener">✏️ Edit this category page</a>` :
+                            `<a href="${createUrl}" target="_blank" rel="noopener">➕ Create a custom page for this category</a>`
+                        }
+                    </div>
+                `;
+                currentSlug = null;  // no article active
+                highlightActiveLink();
+            }
 
-                randomLink.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    if (articlesMetadata.length === 0) return;
-                    const randomIndex = Math.floor(Math.random() * articlesMetadata.length);
-                    window.location.hash = `#/article/${articlesMetadata[randomIndex].slug}`;
-                });
+            // ---------- ROUTING ----------
+            function handleRoute() {
+                const hash = window.location.hash.slice(1); // remove '#'
+                const articleMatch = hash.match(/^\/article\/([^/]+)$/);
+                const categoryMatch = hash.match(/^\/category\/([^/]+)$/);
 
-                // Kick off
-                loadMetadata();
-            })();
-        </script>
-    </body>
+                if (articleMatch) {
+                    selectedCategory = '';   // reset category filter when viewing an article
+                    renderSidebar();         // ensure sidebar shows all articles
+                    loadArticle(decodeURIComponent(articleMatch[1]));
+                } else if (categoryMatch) {
+                    loadCategory(decodeURIComponent(categoryMatch[1]));
+                } else {
+                    // Home
+                    selectedCategory = '';
+                    renderSidebar();
+                    loadArticle(null);
+                }
+            }
+
+            window.addEventListener("hashchange", handleRoute);
+
+            articleListEl.addEventListener("click", (e) => {
+                const link = e.target.closest("a");
+                if (!link || !link.dataset.slug) return;
+                e.preventDefault();
+                window.location.hash = `#/article/${link.dataset.slug}`;
+            });
+
+            searchInput.addEventListener("input", renderSidebar);
+
+            randomLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (articlesMetadata.length === 0) return;
+                const randomIndex = Math.floor(Math.random() * articlesMetadata.length);
+                window.location.hash = `#/article/${articlesMetadata[randomIndex].slug}`;
+            });
+
+            // Kick off
+            loadMetadata();
+        })();
+    </script>
+</body>
 </html>
