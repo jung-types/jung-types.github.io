@@ -1,10 +1,24 @@
 [
   {
+    "slug": "socionics",
+    "title": "Socionics",
+    "category": "Miscellaneous",
+    "tags": [],
+    "path": "Miscellaneous/socionics.md"
+  },
+  {
     "slug": "SHS",
     "title": "SHS",
     "category": "Post-Jungian typologies",
     "tags": [],
     "path": "Post-Jungian typologies/SHS.md"
+  },
+  {
+    "slug": "Post-Jungian typologies",
+    "title": "Post Jungian Typologies",
+    "category": "_categories",
+    "tags": [],
+    "path": "_categories/Post-Jungian typologies.md"
   },
   {
     "slug": "socionics",
